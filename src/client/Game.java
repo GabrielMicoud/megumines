@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
 
 import javax.swing.Timer;
@@ -94,8 +96,10 @@ public class Game implements Runnable{
 	}
 	
 	public void readHighScores() {
+		//Path currentDir = Paths.get("scorefiles");
+		//System.out.println(currentDir.toAbsolutePath());
 		for(int i=0; i<highScores.length; i++) highScores[i] = 0;
-		try(BufferedReader br = new BufferedReader(new FileReader("scorefiles/scorefile"))) {
+		try(BufferedReader br = new BufferedReader(new FileReader("scorefile"))) {
 		    String line = br.readLine();
 		    int i=0;
 
@@ -108,7 +112,7 @@ public class Game implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			try {
-				new File("scorefiles/scorefile").createNewFile();
+				new File("scorefile").createNewFile();
 				System.out.println("Scorefile was created.");
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -121,7 +125,7 @@ public class Game implements Runnable{
 	}
 	
 	public void writeHighScores() {
-		try (PrintWriter out = new PrintWriter("scorefiles/scorefile")) {
+		try (PrintWriter out = new PrintWriter("scorefile")) {
 			for (int i=0; i<highScores.length; i++) {
 				out.println(highScores[i]);
 			}
