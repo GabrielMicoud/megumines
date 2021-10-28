@@ -1,4 +1,8 @@
-# Compiled class file
+#game files
+/scorefiles/scorefile
+
+# Compiled class file in a bin file
+/bin/
 *.class
 
 # Log file
