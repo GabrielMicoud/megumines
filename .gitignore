@@ -1,8 +1,13 @@
 #game files
 /scorefiles/scorefile
 
-# Compiled class file in a bin file
+#project files
+.project
+.classpath
+/.settings/
 /bin/
+
+# Compiled class file in a bin file
 *.class
 
 # Log file
