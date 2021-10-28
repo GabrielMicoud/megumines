@@ -14,8 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import util.Colors;
-import util.HintTextField;
-
 import javax.swing.JButton;
 
 public class ServerTextField extends JFrame implements ActionListener{

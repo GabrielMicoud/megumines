@@ -1,4 +1,4 @@
-package util;
+package display;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
