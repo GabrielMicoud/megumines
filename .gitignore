@@ -1,7 +1,10 @@
 #game files
 scorefile
+settings
 
 #project files
+.xml
+.jardesc
 .project
 .classpath
 /.settings/
