@@ -73,7 +73,6 @@ public class Champ {
 	
 	/**
 	 * set mines
-	 * @param nbMines définit le nombre de mines à placer
 	 */
 	public void placeMines() {
 		int nbMines = numberOfMines;

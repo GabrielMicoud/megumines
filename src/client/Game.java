@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.Timer;
 
@@ -30,6 +33,8 @@ import util.VictoryDefeat;
  *
  */
 public class Game implements Runnable{
+	private static final int ONLINE_HIGH_SCORE_INDEX = 3;
+	private static final int INTRO_DURATION = 2000;
 	
 	Champ c;
 	MainFrame mainFrame;
@@ -47,14 +52,14 @@ public class Game implements Runnable{
 	int elapsedTime;
 	Timer timer;
 	Integer[] highScores = new Integer[4]; // high scores, easy medium hard and online
-	private static final int ONLINE_HIGH_SCORE_INDEX = 3;
+	String[] serverPresets = new String[3];
 	int score = 0;
+	ScheduledExecutorService executorService;
 	
 	/**
 	 * Constructeur du jeu. Il configure la grille en fonction du niveau qu'on lui donne. Selon les choix EASY, MEDIUM et HARD.
 	 * 
 	 * @param level
-	 * @param name
 	 */
 	public Game(Level level) {
 		this.level = level;
@@ -65,12 +70,14 @@ public class Game implements Runnable{
 		readHighScores();
 		mainFrame.setHighScore(highScores[level.ordinal()]);
 		
+		//set initial states
 		for (int x = 0; x < getDimX(); x++)
 			for (int y = 0; y < getDimY(); y++) {
 				states[x][y] = State.HIDDEN;
 				colors[x][y] = Colors.DEFAULT;
 			}
 		
+		//set timer
 		timer = new Timer(1000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -79,6 +86,15 @@ public class Game implements Runnable{
 				mainFrame.getCounterLabel().setText("Time : " + String.format("%03d", seconds));
 			}
 		});
+		
+		//set intro duration
+		executorService = Executors.newSingleThreadScheduledExecutor();
+		executorService.schedule(new Runnable() {
+			@Override
+			public void run() {
+				mainFrame.begin();
+			}
+		}, INTRO_DURATION, TimeUnit.MILLISECONDS);
 	}
 	
 	/**
@@ -126,7 +142,70 @@ public class Game implements Runnable{
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			try {
+				new File("scorefile").createNewFile();
+				System.out.println("Scorefile was created.");
+				writeHighScores();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
+	}
+	
+	public void readServerPresets() {
+		for(int i=0; i<serverPresets.length; i++) serverPresets[i] = "";
+		try(BufferedReader br = new BufferedReader(new FileReader("settings"))) {
+		    String line = br.readLine();
+		    int i=0;
+
+		    while (line != null) {
+		    	serverPresets[i] = line;
+		    	i++;
+		        line = br.readLine();
+		    }
+		} catch (FileNotFoundException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				new File("settings").createNewFile();
+				System.out.println("Server settings file was created.");
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				System.out.println("Server settings file already exists");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeServerPresets() {
+		try (PrintWriter out = new PrintWriter("settings")) {
+			for (int i=0; i<serverPresets.length; i++) {
+				out.println(serverPresets[i]);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			try {
+				new File("settings").createNewFile();
+				System.out.println("Server settings file was created.");
+				writeServerPresets();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	public String[] getServerPresets() {
+		return serverPresets;
+	}
+	
+	public void setServerPresets(String ip, String port, String name) {
+		serverPresets[0] = ip;
+		serverPresets[1] = port;
+		serverPresets[2] = name;
 	}
 	
 	/**
@@ -449,6 +528,7 @@ public class Game implements Runnable{
 	 */
 	
 	public void reveal(int xPos, int yPos, String stateString, String colorString) {
+		System.out.println(xPos + yPos +  stateString + colorString);
 		switch(stateString) {
 		case "ZERO":
 			states[xPos][yPos] = State.ZERO;
@@ -540,7 +620,7 @@ public class Game implements Runnable{
 		while (online) {
 			try {
 				String message = dis.readUTF();
-				//System.out.println(message);
+				System.out.println(message);
 				String[] splittedMessage = message.split(" ");
 				String command = splittedMessage[0];
 				System.out.println(message);
@@ -573,6 +653,18 @@ public class Game implements Runnable{
 						highScores[ONLINE_HIGH_SCORE_INDEX] = score;
 						mainFrame.setHighScore(score);
 					}
+				}
+				else if (command.equals("/flag")) {
+					int xPos = Integer.parseInt(splittedMessage[1]);
+					int yPos = Integer.parseInt(splittedMessage[2]);
+					int nbMines = Integer.parseInt(splittedMessage[3]);
+					reveal(xPos, yPos, State.FLAGGED.name(), Colors.DEFAULT.name());
+				}
+				else if (command.equals("/unflag")) {
+					int xPos = Integer.parseInt(splittedMessage[1]);
+					int yPos = Integer.parseInt(splittedMessage[2]);
+					int nbMines = Integer.parseInt(splittedMessage[3]);
+					reveal(xPos, yPos, State.HIDDEN.name(), Colors.DEFAULT.name());
 				}
 				else if (command.equals("/setNames")) {
 					StringBuffer sb = new StringBuffer();
@@ -640,6 +732,7 @@ public class Game implements Runnable{
 				offline();
 				gameReset(Level.EASY);
 				mainFrame.getServerButton().setButton(false);
+				mainFrame.setOfflineDisplay();
 				mainFrame.refresh();
 			}
 		}

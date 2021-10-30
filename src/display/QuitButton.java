@@ -9,11 +9,13 @@ import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 
 import Ressources.ButtonImage;
-import util.Level;
-import util.VictoryDefeat;
 
 public class QuitButton extends JPanel implements MouseListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -842607530800078411L;
 	private static final int BUTTON_WIDTH = 35;
 	private static final int BUTTON_HEIGHT = 35;
 	MainFrame mainFrame;

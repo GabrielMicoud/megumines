@@ -8,10 +8,12 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 
-import Ressources.ButtonImage;
-
 public class Intro extends JPanel implements MouseListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 152430192859603209L;
 	private static final String IMAGE = "img/intro_megumin.png";
 	private static final int BUTTON_WIDTH = 600;
 	private static final int BUTTON_HEIGHT = 521;

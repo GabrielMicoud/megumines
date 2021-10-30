@@ -19,6 +19,10 @@ import util.Level;
 
 public class LevelButton extends JPanel implements MouseListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1367262671377666827L;
 	Level level;
 	private static final int BUTTON_WIDTH = 35;
 	private static final int BUTTON_HEIGHT = 35;

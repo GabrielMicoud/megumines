@@ -14,6 +14,10 @@ import util.VictoryDefeat;
 
 public class ResetButton extends JPanel implements MouseListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6317216891145459518L;
 	VictoryDefeat v;
 	private static final int BUTTON_WIDTH = 35;
 	private static final int BUTTON_HEIGHT = 35;

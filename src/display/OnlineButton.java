@@ -16,6 +16,10 @@ import util.Level;
 
 public class OnlineButton extends JPanel implements MouseListener {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1698475018649912903L;
 	boolean online;
 	private static final int BUTTON_WIDTH = 100;
 	private static final int BUTTON_HEIGHT = 35;

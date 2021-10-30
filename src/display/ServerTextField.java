@@ -18,6 +18,10 @@ import javax.swing.JButton;
 
 public class ServerTextField extends JFrame implements ActionListener{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1646449553602747996L;
 	private static final String ICON = "img/megumin.png";
 	private JPanel panel1;
 	private JPanel panel2;
@@ -54,9 +58,10 @@ public class ServerTextField extends JFrame implements ActionListener{
 		panel2.setBackground(Colors.BACKGROUND.color);
 		panel2.setLayout(new FlowLayout());
 		label = new JLabel();
-		ip = new HintTextField(defaultIp, 20);
-		port = new HintTextField(defaultPort, 10);
-		name = new HintTextField(defaultName, 10);
+		frame.getGame().readServerPresets();
+		ip = new HintTextField(defaultIp, 20, frame.getGame().getServerPresets()[0]);
+		port = new HintTextField(defaultPort, 10, frame.getGame().getServerPresets()[1]);
+		name = new HintTextField(defaultName, 10, frame.getGame().getServerPresets()[2]);
 		submit = new JButton("Submit");
 		cancel = new JButton ("Cancel");
 		
@@ -88,6 +93,10 @@ public class ServerTextField extends JFrame implements ActionListener{
 			try {
 				frame.getGame().connect(ipAdress, p, nickname);
 				frame.setOnlineDisplay();
+				if(!ipAdress.equals(frame.getGame().getServerPresets()[0]) || !port.getText().equals(frame.getGame().getServerPresets()[1]) || !nickname.equals(frame.getGame().getServerPresets()[2])) {
+					frame.getGame().setServerPresets(ipAdress, port.getText(), nickname);
+					frame.getGame().writeServerPresets();
+				}
 				setVisible(false);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block

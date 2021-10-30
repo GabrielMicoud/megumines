@@ -3,8 +3,8 @@ scorefile
 settings
 
 #project files
-.xml
-.jardesc
+*.xml
+*.jardesc
 .project
 .classpath
 /.settings/

@@ -27,10 +27,14 @@ import util.Level;
 import util.State;
 
 public class MainFrame extends JFrame implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4876718790730079080L;
+	private static final int FONT_SIZE = 20;
 	Game game;
 	Case[][] cases;
 	State[][] states;
-	private static final int FONT_SIZE = 20;
 	private static final String ICON = "img/megumin.png";
 	private QuitButton butQuit;
 	private JLabel counterLabel;
@@ -48,8 +52,9 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JPanel haut;
 	private JPanel mines;
 	private JPanel bas;
+	private boolean isIntro = true;
 	public MainFrame(Game game) {
-		super("Megumineur");
+		super("Megumines");
 		this.game = game;
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
@@ -152,6 +157,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	}
 	
 	public void begin() {
+		if(!isIntro) return;
+		isIntro = false;
 		remove(intro);
 		add(haut, BorderLayout.NORTH);
 		add(mines, BorderLayout.CENTER);
@@ -300,21 +307,6 @@ public class MainFrame extends JFrame implements ActionListener {
 			game.gameReset(Level.HARD);
 			refresh();
 		}
-		/*if(e.getSource() == butServ) {
-			if(!game.isOnline()) {
-				//game.connect("localhost", 2000, "Megumin"); //MAGIC TEXT AND NUMBER TO REMOVE
-				stf = new ServerTextField(this);
-			} else {
-				try {
-					game.disconnect();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				game.gameReset(false, Level.EASY);
-				refresh();
-			}
-		}*/
 	}
 }
 

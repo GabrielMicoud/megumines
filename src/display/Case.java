@@ -19,6 +19,11 @@ import util.State;
  *
  */
 public class Case extends JPanel implements MouseListener{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2222920794360879894L;
 	State state;
 	private static final int CASE_WIDTH = 24;
 	private static final int CASE_HEIGHT = 24;
