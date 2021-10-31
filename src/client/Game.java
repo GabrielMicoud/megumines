@@ -149,6 +149,7 @@ public class Game implements Runnable{
 				writeHighScores();
 			} catch (IOException e1) {
 				e1.printStackTrace();
+				System.out.println("Scorefile already exists");
 			}
 		}
 	}
@@ -195,6 +196,7 @@ public class Game implements Runnable{
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("Server settings file already exists");
 			}
 		}
 	}
@@ -220,7 +222,6 @@ public class Game implements Runnable{
 	 */
 	
 	public void connect(String ip, int port, String nickname) throws UnknownHostException, IOException {
-		System.out.println(ip + " " + port + " " + name);
 		mainFrame.setHighScore(highScores[ONLINE_HIGH_SCORE_INDEX]);
 		this.name = nickname;
 		online = true;
@@ -672,6 +673,7 @@ public class Game implements Runnable{
 				else if (command.equals("/success")) {
 					elapsedTime = 0;
 					seconds = 0;
+					victory = false;
 					mainFrame.getCounterLabel().setText("Time : " + String.format("%03d", seconds));
 					mainFrame.getServerButton().setButton(true);
 					setResetButton(VictoryDefeat.IDLE);
@@ -752,11 +754,11 @@ public class Game implements Runnable{
 				}
 				else if (command.equals("/victory")) {
 					setResetButton(VictoryDefeat.VICTORY);
+					victory();
 				}
 				else if(command.equals("/setGrid")) {
 					int sizeX = Integer.parseInt(splittedMessage[1]);
 					int sizeY = Integer.parseInt(splittedMessage[2]);
-					System.out.println("Taille de la grille: " + sizeX + " y: " + sizeY);
 					states = new State[sizeX][sizeY];
 					colors = new Colors[sizeX][sizeY];
 					for (int x = 0; x < sizeX; x++)

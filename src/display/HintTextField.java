@@ -1,5 +1,6 @@
 package display;
 
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -40,6 +41,11 @@ public class HintTextField extends JTextField implements FocusListener {
 	
 	@Override
 	public String getText() {
-	    return showingHint ? "" : super.getText();
+	    if(showingHint) {
+	    	return ""; 
+	    }
+	    else {
+	    	return super.getText();
+	    }
 	}
 }

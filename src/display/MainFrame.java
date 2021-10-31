@@ -24,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import client.Game;
 import util.Colors;
 import util.Level;
+import util.PlayerColors;
 import util.State;
 
 public class MainFrame extends JFrame implements ActionListener {
@@ -31,11 +32,15 @@ public class MainFrame extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 4876718790730079080L;
-	private static final int FONT_SIZE = 20;
+	private static final String ICON = "img/megumin.png";
+	private static final String DEFAULT_FONT = "Verdana";
+	private static final int SCORE_FONT_SIZE = 20;
+	private static final int PLAYER_FONT_SIZE = 15;
+	private static final int MAX_NB_PLAYERS = 5;
+	private static final int NB_ITEMS = 3;
 	Game game;
 	Case[][] cases;
 	State[][] states;
-	private static final String ICON = "img/megumin.png";
 	private QuitButton butQuit;
 	private JLabel counterLabel;
 	private JLabel scoreLabel;
@@ -48,7 +53,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	private LevelButton butMedium;
 	private LevelButton butHard;
 	private Intro intro;
-	private JPanel gauche;
+	private JPanel droite;
+	private JPanel playersPanel;
 	private JPanel haut;
 	private JPanel mines;
 	private JPanel bas;
@@ -73,20 +79,26 @@ public class MainFrame extends JFrame implements ActionListener {
 		//haut de page
 		haut = new JPanel();
 		haut.setLayout(new FlowLayout());
-		haut.setBackground(Colors.BACKGROUND.color);
+		haut.setBackground(Colors.DARK_BACKGROUND.color);
 		//bas de page
 		bas = new JPanel();
 		bas.setLayout(new FlowLayout());
-		bas.setBackground(Colors.BACKGROUND.color);
+		bas.setBackground(Colors.DARK_BACKGROUND.color);
 		//mines
 		mines = new JPanel();
 		mines.setBackground(Colors.BACKGROUND.color);
 		mines.setBorder(new CompoundBorder(mines.getBorder(), new EmptyBorder(20,20,20,20)));
-		//gauche
-		gauche = new JPanel();
-		gauche.setLayout(new GridLayout(7,1));
-		gauche.setBorder(new CompoundBorder(gauche.getBorder(), new EmptyBorder(20,20,20,20)));
-		gauche.setBackground(Colors.BACKGROUND.color);
+		//droite
+		droite = new JPanel();
+		droite.setLayout(new BorderLayout());
+		droite.setBorder(new CompoundBorder(droite.getBorder(), new EmptyBorder(20,20,20,20)));
+		droite.setBackground(Colors.DARK_BACKGROUND.color);
+		
+		//players
+		playersPanel= new JPanel();
+		playersPanel.setLayout(new GridLayout(3,1));
+		playersPanel.setBorder(new CompoundBorder(droite.getBorder(), new EmptyBorder(20,20,20,20)));
+		playersPanel.setBackground(Colors.DARK_BACKGROUND.color);
 		
 		/**
 		 * boutons et labels de haut de page
@@ -94,24 +106,24 @@ public class MainFrame extends JFrame implements ActionListener {
 		
 		//counter
 		counterLabel = new JLabel("Time : " + String.format("%03d", 0));
-		counterLabel.setFont(new Font("Verdana", Font.PLAIN, FONT_SIZE));
+		counterLabel.setFont(new Font(DEFAULT_FONT, Font.PLAIN, SCORE_FONT_SIZE));
 		counterLabel.setHorizontalAlignment(JLabel.CENTER);
 		counterLabel.setForeground(Color.WHITE);
-		gauche.add(counterLabel);
+		playersPanel.add(counterLabel);
 		
 		//score
 		scoreLabel = new JLabel("Score : " + String.format("%04d", 0));
-		scoreLabel.setFont(new Font("Verdana", Font.PLAIN, FONT_SIZE));
+		scoreLabel.setFont(new Font(DEFAULT_FONT, Font.PLAIN, SCORE_FONT_SIZE));
 		scoreLabel.setHorizontalAlignment(JLabel.CENTER);
 		scoreLabel.setForeground(Color.WHITE);
-		gauche.add(scoreLabel);
+		playersPanel.add(scoreLabel);
 		
 		//high score
 		highScoreLabel = new JLabel("High score : " + String.format("%04d", 0));
-		highScoreLabel.setFont(new Font("Verdana", Font.PLAIN, FONT_SIZE));
+		highScoreLabel.setFont(new Font(DEFAULT_FONT, Font.PLAIN, SCORE_FONT_SIZE));
 		highScoreLabel.setHorizontalAlignment(JLabel.CENTER);
 		highScoreLabel.setForeground(Color.WHITE);
-		gauche.add(highScoreLabel);
+		playersPanel.add(highScoreLabel);
 				
 		//Quit button
 		butQuit = new QuitButton(this);
@@ -148,10 +160,6 @@ public class MainFrame extends JFrame implements ActionListener {
 		 */
 		
 		add(intro);
-		/*add(haut, BorderLayout.NORTH);
-		add(mines, BorderLayout.CENTER);
-		add(bas, BorderLayout.SOUTH);
-		add(gauche, BorderLayout.WEST);*/
 		refresh();
 		
 	}
@@ -160,17 +168,18 @@ public class MainFrame extends JFrame implements ActionListener {
 		if(!isIntro) return;
 		isIntro = false;
 		remove(intro);
-		add(haut, BorderLayout.NORTH);
+		droite.add(haut, BorderLayout.NORTH);
+		droite.add(playersPanel, BorderLayout.CENTER);
+		droite.add(bas, BorderLayout.SOUTH);
 		add(mines, BorderLayout.CENTER);
-		add(bas, BorderLayout.SOUTH);
-		add(gauche, BorderLayout.WEST);
+		add(droite, BorderLayout.EAST);
 		refresh();
 	}
 	
 	public void refresh() {
 		if(game.isOnline()) {
 			for(JLabel player: players) {
-				player.setForeground(Colors.values()[players.indexOf(player)].color);
+				player.setForeground(PlayerColors.values()[players.indexOf(player)].color);
 			}
 		}
 		pack();
@@ -187,16 +196,16 @@ public class MainFrame extends JFrame implements ActionListener {
 		//player.setBackground(Colors.values()[index].color);
 		player.setForeground(Colors.values()[index].color);
 		player.setHorizontalAlignment(JLabel.CENTER);
-		player.setFont(new Font("Verdana", Font.PLAIN, FONT_SIZE));
+		player.setFont(new Font(DEFAULT_FONT, Font.PLAIN, PLAYER_FONT_SIZE));
 		player.setText(name + " : 0000");
 		players.add(player);
-		gauche.add(players.get(index));
+		playersPanel.add(players.get(index));
 		playerNames.add(name);
 		refresh();
 	}
 	
 	public void removePlayer(int index) {
-		gauche.remove(players.get(index));
+		playersPanel.remove(players.get(index));
 		playerNames.remove(playerNames.get(index));
 		players.remove(index);
 		refresh();
@@ -238,8 +247,8 @@ public class MainFrame extends JFrame implements ActionListener {
 		bas.remove(butEasy);
 		bas.remove(butMedium);
 		bas.remove(butHard);
-		
-		gauche.remove(scoreLabel);
+		playersPanel.setLayout(new GridLayout(MAX_NB_PLAYERS + 2, 1));
+		playersPanel.remove(scoreLabel);
 		refresh();
 	}
 	
@@ -248,8 +257,9 @@ public class MainFrame extends JFrame implements ActionListener {
 		bas.add(butMedium);
 		bas.add(butHard);
 		
-		for(JLabel player : players) gauche.remove(player);
-		gauche.add(scoreLabel);
+		for(JLabel player : players) playersPanel.remove(player);
+		playersPanel.setLayout(new GridLayout(3, 1));
+		playersPanel.add(scoreLabel);
 		refresh();
 	}
 	

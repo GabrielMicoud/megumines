@@ -22,6 +22,7 @@ public class ServerTextField extends JFrame implements ActionListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1646449553602747996L;
+	private static final int MAX_NAME_LENGTH = 25;
 	private static final String ICON = "img/megumin.png";
 	private JPanel panel1;
 	private JPanel panel2;
@@ -90,6 +91,10 @@ public class ServerTextField extends JFrame implements ActionListener{
 			String ipAdress = ip.getText();
 			int p = Integer.parseInt(port.getText());
 			String nickname = name.getText();
+			//troncature des pseudos trop longs
+			if(nickname.length() > MAX_NAME_LENGTH) {
+				nickname = nickname.substring(0, MAX_NAME_LENGTH - 3) + "...";
+			}
 			try {
 				frame.getGame().connect(ipAdress, p, nickname);
 				frame.setOnlineDisplay();
