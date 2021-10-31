@@ -28,6 +28,7 @@ public class Case extends JPanel implements MouseListener{
 	private static final int CASE_WIDTH = 24;
 	private static final int CASE_HEIGHT = 24;
 	public int x, y;
+	boolean goingToClick;
 	private String imgString;
 	Game game;
 	
@@ -82,12 +83,7 @@ public class Case extends JPanel implements MouseListener{
  	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if(e.getButton() == MouseEvent.BUTTON1) {
-			game.play(x, y);
-		}
-		if(e.getButton() == MouseEvent.BUTTON3) {
-			game.flag(x, y);
-		}
+		
 	}
 	@Override
 	public void mouseEntered(MouseEvent e) {
@@ -104,15 +100,26 @@ public class Case extends JPanel implements MouseListener{
 			imgString = CaseImage.UNKNOWN;
 			refresh();
 		}
+		goingToClick = false;
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+		goingToClick = true;
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		//click
+		if(goingToClick) {
+			if(e.getButton() == MouseEvent.BUTTON1) {
+				game.play(x, y);
+			}
+			if(e.getButton() == MouseEvent.BUTTON3) {
+				game.flag(x, y);
+			}
+			goingToClick = false;
+		}
+		//double click
+		if(e.getClickCount() == 2) game.doubleClick(x, y);
 	}
 }

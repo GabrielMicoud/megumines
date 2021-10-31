@@ -43,6 +43,7 @@ public class Game implements Runnable{
 	Level level;
 	boolean online = false;
 	boolean firstclick = true;
+	boolean victory = false;
 	Socket socket;
 	DataInputStream dis;
 	DataOutputStream dos;
@@ -258,6 +259,7 @@ public class Game implements Runnable{
 	 */
 	
 	public void gameReset(Level level) {
+		victory = false;
 		writeHighScores();
 		mainFrame.setHighScore(highScores[level.ordinal()]);
 		if(online) {
@@ -346,10 +348,7 @@ public class Game implements Runnable{
 		revealedCases = c.getDimX() * c.getDimY() - hiddenCases;
 		if(revealedCases >= c.getDimX() * c.getDimY() - c.getNbMines()) {
 			//victory
-			System.out.println("Victory");
-			timer.stop();
-			setResetButton(VictoryDefeat.VICTORY);
-			writeHighScores();
+			victory();
 		}
 		score += c.detectMines(xPos, yPos);
 		mainFrame.getScoreLabel().setText("Score : " + String.format("%04d", score));
@@ -357,6 +356,26 @@ public class Game implements Runnable{
 			highScores[level.ordinal()] = score;
 			mainFrame.setHighScore(score);
 		}
+	}
+	
+	public void victory() {
+		System.out.println("Victory");
+		victory = true;
+		timer.stop();
+		setResetButton(VictoryDefeat.VICTORY);
+		writeHighScores();
+		for (int x = 0; x < getDimX(); x++) {
+			for (int y = 0; y < getDimY(); y++){
+				if (c.isMine(x, y)) {
+					states[x][y] = State.BOMB;
+				}
+				else {
+					int proximityMines = c.detectMines(x, y);
+					states[x][y] = State.values()[proximityMines]; // l'index est de zéro à huit
+				}
+			}
+		}
+		mainFrame.draw();
 	}
 
 	/**
@@ -421,10 +440,11 @@ public class Game implements Runnable{
 	 */
 	
 	public void play(int xPos, int yPos) {
+		if(victory) return;
 		//hors ligne
 		if(!online) {
 			if(states[xPos][yPos] != State.HIDDEN && states[xPos][yPos] != State.FLAGGED) return; //lorsqu'on joue (clic gauche), la case doit être cachée ou flaggée
-			
+
 			if(firstclick) {
 				timer.start();
 			}
@@ -478,7 +498,6 @@ public class Game implements Runnable{
 		else {
 			try {
 				dos.writeUTF("/play " + xPos + " " + yPos);
-				System.out.println("/play " + xPos + " " + yPos);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -494,7 +513,7 @@ public class Game implements Runnable{
 	 */
 	
 	public void flag(int xPos, int yPos) {
-		
+		if(victory) return;
 		//en ligne
 		if(!online) {
 			if(states[xPos][yPos] == State.HIDDEN) {
@@ -519,6 +538,30 @@ public class Game implements Runnable{
 		}
 	}
 	
+	public void doubleClick(int xPos, int yPos) {
+		if(victory) return;
+		//si on est caché, flaggé, ou en ligne, on joue pas
+		if(states[xPos][yPos] == State.HIDDEN || states[xPos][yPos] == State.FLAGGED || online) return;
+		int countFlags = 0;
+		//comptage de drapeaux
+		for (int i = Math.max(xPos-1, 0); i <= Math.min(xPos+1, getDimX()-1); i++) {
+			for(int j = Math.max(yPos-1, 0); j<= Math.min(yPos+1, getDimY()-1); j++) {
+				if(states[i][j] == State.FLAGGED) countFlags ++;
+			}
+		}
+		//si le nb de mines égale le nb de drapeaux, on joue autour
+		if(c.detectMines(xPos, yPos) == countFlags) {
+			System.out.println("Double clicked.");
+			for (int i = Math.max(xPos-1, 0); i <= Math.min(xPos+1, getDimX()-1); i++) {
+				for(int j = Math.max(yPos-1, 0); j<= Math.min(yPos+1, getDimY()-1); j++) {
+					if(states[i][j] == State.HIDDEN) {
+						play(i, j);
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Cette fonction change l'état et la couleur de la case aux coordonnées xPos et yPos, selon l'état et la couleur qu'on lui donne. 
 	 * @param xPos
@@ -528,7 +571,6 @@ public class Game implements Runnable{
 	 */
 	
 	public void reveal(int xPos, int yPos, String stateString, String colorString) {
-		System.out.println(xPos + yPos +  stateString + colorString);
 		switch(stateString) {
 		case "ZERO":
 			states[xPos][yPos] = State.ZERO;
@@ -620,10 +662,9 @@ public class Game implements Runnable{
 		while (online) {
 			try {
 				String message = dis.readUTF();
-				System.out.println(message);
 				String[] splittedMessage = message.split(" ");
 				String command = splittedMessage[0];
-				System.out.println(message);
+				//System.out.println(message);
 				if (command.equals("/whatsyourname")) dos.writeUTF("/name " + name);
 				else if (command.equals("/maxplayers")) {
 					//déjà trop de joueurs
