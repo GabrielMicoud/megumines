@@ -1,6 +1,8 @@
 # megumines
-A little minesweeper, just for fun.
-Just execute the Megumines.exe file to play.
+- A little minesweeper, just for fun.
+- Just execute the Megumines.exe file to play.
+
+*Well, this is my first video game, and it might have some bugs, also it will ask you to install Java SE 16.0.2*
 
 ## Offline game
 There are 6 buttons:
